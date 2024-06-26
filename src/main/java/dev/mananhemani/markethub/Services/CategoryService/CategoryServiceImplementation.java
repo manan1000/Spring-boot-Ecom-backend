@@ -5,9 +5,7 @@ import dev.mananhemani.markethub.Exceptions.ResourceNotFoundException;
 import dev.mananhemani.markethub.Models.Category;
 import dev.mananhemani.markethub.Repositories.CategoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 import java.util.List;
 
 
