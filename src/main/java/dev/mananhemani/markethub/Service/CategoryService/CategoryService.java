@@ -1,7 +1,6 @@
 package dev.mananhemani.markethub.Service.CategoryService;
 
 import dev.mananhemani.markethub.Model.Category;
-import org.springframework.stereotype.Service;
 
 import java.util.List;
 
