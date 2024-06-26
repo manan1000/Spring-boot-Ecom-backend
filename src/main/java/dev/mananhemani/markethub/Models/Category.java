@@ -1,4 +1,4 @@
-package dev.mananhemani.markethub.Model;
+package dev.mananhemani.markethub.Models;
 
 
 import jakarta.persistence.*;

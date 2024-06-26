@@ -1,6 +1,6 @@
-package dev.mananhemani.markethub.Service.CategoryService;
+package dev.mananhemani.markethub.Services.CategoryService;
 
-import dev.mananhemani.markethub.Model.Category;
+import dev.mananhemani.markethub.Models.Category;
 
 import java.util.List;
 

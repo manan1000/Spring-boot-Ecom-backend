@@ -1,7 +1,7 @@
-package dev.mananhemani.markethub.Service.CategoryService;
+package dev.mananhemani.markethub.Services.CategoryService;
 
-import dev.mananhemani.markethub.Model.Category;
-import dev.mananhemani.markethub.Repository.CategoryRepository;
+import dev.mananhemani.markethub.Models.Category;
+import dev.mananhemani.markethub.Repositories.CategoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;

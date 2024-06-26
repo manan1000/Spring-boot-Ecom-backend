@@ -1,7 +1,7 @@
-package dev.mananhemani.markethub.Controller;
+package dev.mananhemani.markethub.Controllers;
 
-import dev.mananhemani.markethub.Model.Category;
-import dev.mananhemani.markethub.Service.CategoryService.CategoryService;
+import dev.mananhemani.markethub.Models.Category;
+import dev.mananhemani.markethub.Services.CategoryService.CategoryService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
