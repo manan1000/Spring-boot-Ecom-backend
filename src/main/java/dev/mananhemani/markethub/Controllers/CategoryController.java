@@ -1,5 +1,6 @@
 package dev.mananhemani.markethub.Controllers;
 
+import dev.mananhemani.markethub.Configs.AppConstants;
 import dev.mananhemani.markethub.DTOs.Category.CategoryDTO;
 import dev.mananhemani.markethub.DTOs.Category.CategoryResponse;
 import dev.mananhemani.markethub.Services.CategoryService.CategoryService;
@@ -17,8 +18,11 @@ public class CategoryController {
     private CategoryService categoryService;
 
     @GetMapping("/public/categories")
-    public ResponseEntity<CategoryResponse> getALlCategories(){
-        CategoryResponse categoryResponse = categoryService.getAllCategories();
+    public ResponseEntity<CategoryResponse> getALlCategories(
+            @RequestParam(name = "pageNumber" , defaultValue = AppConstants.PAGE_NUMBER , required = false) Integer pageNumber,
+            @RequestParam(name = "pageSize" , defaultValue = AppConstants.PAGE_SIZE , required = false) Integer pageSize
+    ){
+        CategoryResponse categoryResponse = categoryService.getAllCategories(pageNumber,pageSize);
         return new ResponseEntity<>(categoryResponse,HttpStatus.OK);
     }
 
