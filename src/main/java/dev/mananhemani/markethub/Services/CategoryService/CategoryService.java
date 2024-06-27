@@ -1,17 +1,16 @@
 package dev.mananhemani.markethub.Services.CategoryService;
 
-import dev.mananhemani.markethub.Models.Category;
-
-import java.util.List;
+import dev.mananhemani.markethub.DTOs.Category.CategoryDTO;
+import dev.mananhemani.markethub.DTOs.Category.CategoryResponse;
 
 
 public interface CategoryService {
 
-    List<Category> getAllCategories();
+    CategoryResponse getAllCategories();
 
-    void createCategory(Category category);
+    CategoryDTO createCategory(CategoryDTO categoryDTO);
 
-    String deleteCategory(Long categoryId);
+    CategoryDTO deleteCategory(Long categoryId);
 
-    void updateCategory(Category category, Long categoryId);
+    CategoryDTO updateCategory(CategoryDTO categoryDTO, Long categoryId);
 }
