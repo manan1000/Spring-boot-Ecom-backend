@@ -2,7 +2,6 @@ package dev.mananhemani.markethub.Services.CategoryService;
 
 import dev.mananhemani.markethub.DTOs.Category.CategoryDTO;
 import dev.mananhemani.markethub.DTOs.Category.CategoryResponse;
-import dev.mananhemani.markethub.DTOs.Product.ProductResponse;
 import dev.mananhemani.markethub.Exceptions.ApiException;
 import dev.mananhemani.markethub.Exceptions.ResourceNotFoundException;
 import dev.mananhemani.markethub.Models.Category;

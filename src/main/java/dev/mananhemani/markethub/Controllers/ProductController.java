@@ -3,7 +3,6 @@ package dev.mananhemani.markethub.Controllers;
 import dev.mananhemani.markethub.Configs.AppConstants;
 import dev.mananhemani.markethub.DTOs.Product.ProductDTO;
 import dev.mananhemani.markethub.DTOs.Product.ProductResponse;
-import dev.mananhemani.markethub.Models.Product;
 import dev.mananhemani.markethub.Services.ProductService.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
