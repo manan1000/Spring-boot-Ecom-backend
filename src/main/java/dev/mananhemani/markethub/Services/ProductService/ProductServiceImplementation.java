@@ -8,6 +8,7 @@ import dev.mananhemani.markethub.Models.Category;
 import dev.mananhemani.markethub.Models.Product;
 import dev.mananhemani.markethub.Repositories.CategoryRepository;
 import dev.mananhemani.markethub.Repositories.ProductRepository;
+import dev.mananhemani.markethub.Services.FileService.FileService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -15,7 +16,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @Service
@@ -26,6 +29,9 @@ public class ProductServiceImplementation implements ProductService{
 
     @Autowired
     private CategoryRepository categoryRepository;
+
+    @Autowired
+    private FileService fileService;
 
     @Autowired
     private ModelMapper modelMapper;
@@ -152,4 +158,19 @@ public class ProductServiceImplementation implements ProductService{
         productRepository.delete(product);
         return modelMapper.map(product,ProductDTO.class);
     }
+
+    @Override
+    public ProductDTO updateProductImage(Long productId, MultipartFile image) throws IOException {
+        Product productFromDB = productRepository.findById(productId)
+                .orElseThrow(() -> new ResourceNotFoundException("Product","productId",productId));
+
+        String path = "images/";
+        String fileName = fileService.uploadImage(path,image);
+
+        productFromDB.setImage(fileName);
+        Product updateProduct = productRepository.save(productFromDB);
+        return modelMapper.map(updateProduct, ProductDTO.class);
+    }
+
+
 }
