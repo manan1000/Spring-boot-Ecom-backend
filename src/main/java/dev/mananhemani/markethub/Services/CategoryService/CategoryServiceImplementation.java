@@ -2,6 +2,7 @@ package dev.mananhemani.markethub.Services.CategoryService;
 
 import dev.mananhemani.markethub.DTOs.Category.CategoryDTO;
 import dev.mananhemani.markethub.DTOs.Category.CategoryResponse;
+import dev.mananhemani.markethub.DTOs.Product.ProductResponse;
 import dev.mananhemani.markethub.Exceptions.ApiException;
 import dev.mananhemani.markethub.Exceptions.ResourceNotFoundException;
 import dev.mananhemani.markethub.Models.Category;
@@ -42,14 +43,14 @@ public class CategoryServiceImplementation implements CategoryService{
                 .map(category -> modelMapper.map(category, CategoryDTO.class))
                 .toList();
 
-        CategoryResponse categoryResponse = new CategoryResponse();
-        categoryResponse.setContent(categoryDTOS);
-        categoryResponse.setPageNumber(categoryPage.getNumber());
-        categoryResponse.setPageSize(categoryPage.getSize());
-        categoryResponse.setTotalElements(categoryPage.getTotalElements());
-        categoryResponse.setTotalPages(categoryPage.getTotalPages());
-        categoryResponse.setLastPage(categoryPage.isLast());
-        return categoryResponse;
+        return CategoryResponse.builder()
+                .content(categoryDTOS)
+                .pageNumber(categoryPage.getNumber())
+                .pageSize(categoryPage.getSize())
+                .totalElements(categoryPage.getTotalElements())
+                .totalPages(categoryPage.getTotalPages())
+                .lastPage(categoryPage.isLast())
+                .build();
     }
 
     @Override
