@@ -11,6 +11,7 @@ import dev.mananhemani.markethub.Repositories.ProductRepository;
 import dev.mananhemani.markethub.Services.FileService.FileService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -36,15 +37,30 @@ public class ProductServiceImplementation implements ProductService{
     @Autowired
     private ModelMapper modelMapper;
 
+    @Value("${project.image.path}")
+    private String path;
+
     @Override
     public ProductDTO addProduct(Long categoryId, ProductDTO productDTO) {
         Category category = categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new ResourceNotFoundException("Category","categoryId",categoryId));
 
-        Product product = modelMapper.map(productDTO,Product.class);
-        product.setCategory(category);
-        product.setImage("default.png");
-        product.setSpecialPrice(product.getPrice() - (product.getDiscount()*0.01* product.getPrice()));
+        Product productFromDB = productRepository.findByProductName(productDTO.getProductName());
+
+        if(productFromDB!=null) {
+            throw new ApiException("Product with name: " + productDTO.getProductName() + " already exists");
+        }
+
+        Product product = Product.builder()
+                .productName(productDTO.getProductName())
+                .category(category)
+                .description(productDTO.getDescription())
+                .quantity(productDTO.getQuantity())
+                .price(productDTO.getPrice())
+                .discount(productDTO.getDiscount())
+                .specialPrice(productDTO.getPrice() - (productDTO.getDiscount()*0.01* productDTO.getPrice()))
+                .build();
+
         Product savedProduct = productRepository.save(product);
         return modelMapper.map(savedProduct,ProductDTO.class);
     }
@@ -94,11 +110,11 @@ public class ProductServiceImplementation implements ProductService{
                 : Sort.by(sortBy).descending();
 
         Pageable pageDetails = PageRequest.of(pageNumber,pageSize,sortByAndOrder);
-        Page<Product> productPage = productRepository.findAll(pageDetails);
+        Page<Product> productPage = productRepository.findAllByCategoryOrderByProductId(category,pageDetails);
 
-        List<Product> products= productPage.getContent();
+        List<Product> products = productPage.getContent();
 
-        if(products.isEmpty()) throw new ApiException("Products list is empty");
+        if(products.isEmpty()) throw new ApiException("No products available for this category");
 
         List<ProductDTO> productDTOS= products.stream()
                 .map(product -> modelMapper.map(product,ProductDTO.class))
@@ -117,9 +133,15 @@ public class ProductServiceImplementation implements ProductService{
     @Override
     public ProductResponse getProductsByKeyword(String keyword, Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
 
-        List<Product> products = productRepository.findByProductNameLikeIgnoreCase('%'+keyword+'%');
+        Sort sortByAndOrder = sortOrder.equalsIgnoreCase("asc")
+                ? Sort.by(sortBy).ascending()
+                : Sort.by(sortBy).descending();
 
-        if(products.isEmpty()) throw new ApiException("Products list is empty");
+        Pageable pageDetails = PageRequest.of(pageNumber,pageSize,sortByAndOrder);
+        Page<Product> productPage = productRepository.findByProductNameLikeIgnoreCase('%'+keyword+'%',pageDetails);
+
+        List<Product> products = productPage.getContent();
+        if(products.isEmpty()) throw new ApiException("No products found");
 
         List<ProductDTO> productDTOS= products.stream()
                 .map(product -> modelMapper.map(product,ProductDTO.class))
@@ -127,6 +149,11 @@ public class ProductServiceImplementation implements ProductService{
 
         return ProductResponse.builder()
                 .content(productDTOS)
+                .pageNumber(productPage.getNumber())
+                .pageSize(productPage.getSize())
+                .totalElements(productPage.getTotalElements())
+                .totalPages(productPage.getTotalPages())
+                .lastPage(productPage.isLast())
                 .build();
     }
 
@@ -164,7 +191,7 @@ public class ProductServiceImplementation implements ProductService{
         Product productFromDB = productRepository.findById(productId)
                 .orElseThrow(() -> new ResourceNotFoundException("Product","productId",productId));
 
-        String path = "images/";
+
         String fileName = fileService.uploadImage(path,image);
 
         productFromDB.setImage(fileName);

@@ -8,6 +8,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 
 @Entity(name = "categories") // or can use @Table(name = "categories_table") for table name
 @Data
@@ -23,5 +25,6 @@ public class Category {
     @NotBlank(message = "Category name cannot be blank!")
     private String categoryName;
 
-
+    @OneToMany(mappedBy = "category" , cascade = CascadeType.ALL)
+    private List<Product> products;
 }
