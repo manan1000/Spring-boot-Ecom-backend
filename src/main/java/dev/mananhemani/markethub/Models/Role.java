@@ -2,10 +2,7 @@ package dev.mananhemani.markethub.Models;
 
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 
 @Entity
@@ -20,6 +17,7 @@ public class Role {
     @Column(name = "role_id")
     private Long roleId;
 
+    @ToString.Exclude
     @Column(length = 20,name = "role_name")
     @Enumerated(EnumType.STRING)
     private AppRole roleName;
