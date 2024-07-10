@@ -1,6 +1,6 @@
-package dev.mananhemani.markethub.Security.JWT;
+package dev.mananhemani.markethub.DTOs.Security;
 
-
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -10,8 +10,12 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class LoginRequest {
+public class UserInfoResponse {
 
+    private Long id;
+    private String jwtToken;
     private String username;
-    private String password;
+    private List<String> roles;
 }
+
+
