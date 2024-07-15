@@ -13,7 +13,6 @@ import lombok.NoArgsConstructor;
 public class UserInfoResponse {
 
     private Long id;
-    private String jwtToken;
     private String username;
     private List<String> roles;
 }

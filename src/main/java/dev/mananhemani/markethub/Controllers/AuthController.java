@@ -14,7 +14,9 @@ import dev.mananhemani.markethub.Security.JWT.JwtUtils;
 import dev.mananhemani.markethub.Security.Services.UserDetailsImplementation;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -67,14 +69,22 @@ public class AuthController {
         SecurityContextHolder.getContext().setAuthentication(authentication);
         UserDetailsImplementation userDetails = (UserDetailsImplementation) authentication.getPrincipal();
 
-        String jwtToken = jwtUtils.generateTokenFromUsername(userDetails);
+        ResponseCookie jwtCookie = jwtUtils.generateJwtCookie(userDetails);
         List<String> roles = userDetails.getAuthorities()
                 .stream()
                 .map(GrantedAuthority::getAuthority)
                 .toList();
 
-        UserInfoResponse response = new UserInfoResponse(userDetails.getId(),jwtToken,userDetails.getUsername(),roles);
-        return ResponseEntity.ok(response);
+        UserInfoResponse response = UserInfoResponse.builder()
+                .id(userDetails.getId())
+                .username(userDetails.getUsername())
+                .roles(roles)
+                .build();
+
+        return ResponseEntity
+                .ok()
+                .header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
+                .body(response);
     }
 
 
@@ -101,6 +111,7 @@ public class AuthController {
         if(strRoles == null){
             Role userRole = roleRepository.findByRoleName(AppRole.ROLE_BUYER)
                     .orElseThrow(() -> new RuntimeException("Error: Role not found."));
+            roles.add(userRole);
         }
         else{
             for (String role : strRoles) {
@@ -123,11 +134,11 @@ public class AuthController {
                         roles.add(userRole);
                 }
 
-                user.setRoles(roles);
-                userRepository.save(user);
-
-                return ResponseEntity.ok().body(new MessageResponse("User registered successfully"));
             }
         }
+        user.setRoles(roles);
+        userRepository.save(user);
+
+        return ResponseEntity.ok().body(new MessageResponse("User registered successfully"));
     }
 }
