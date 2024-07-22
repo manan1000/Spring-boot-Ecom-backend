@@ -10,12 +10,12 @@ import dev.mananhemani.markethub.Models.Product;
 import dev.mananhemani.markethub.Repositories.CartItemRepository;
 import dev.mananhemani.markethub.Repositories.CartRepository;
 import dev.mananhemani.markethub.Repositories.ProductRepository;
+import dev.mananhemani.markethub.Utils.AuthUtil;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Stream;
 
 @Service
 public class CartServiceImplementation implements CartService {
@@ -36,23 +36,26 @@ public class CartServiceImplementation implements CartService {
     private AuthUtil authUtil;
 
     @Override
-    public CartDTO addProductToCart(Long productId, Long quantity) {
+    public CartDTO addProductToCart(Long productId, Integer quantity) {
 
-        // Find existing cart or create new one
-        Cart cart = createCart();
+        Cart cart  = createCart();
 
-        // Retrieve product details
         Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new ResourceNotFoundException("Product","ProductId",productId));
+                .orElseThrow(() -> new ResourceNotFoundException("Product", "productId", productId));
 
-        CartItem cartItem = cartItemRepository.findCartItemByProductIdAndCartId(cart.getCartId(),productId);
+        CartItem cartItem = cartItemRepository.findCartItemByProductIdAndCartId(cart.getCartId(), productId);
 
-        if(cartItem!=null) throw new ApiException("Product "+product.getProductName()+" already exists in the cart");
+        if (cartItem != null) {
+            throw new ApiException("Product " + product.getProductName() + " already exists in the cart");
+        }
 
-        if(product.getQuantity()==0) throw new ApiException(product.getProductName()+" is not available!");
+        if (product.getQuantity() == 0) {
+            throw new ApiException(product.getProductName() + " is not available");
+        }
 
-        if(product.getQuantity()<quantity){
-            throw new ApiException("Only "+product.getQuantity()+" are available");
+        if (product.getQuantity() < quantity) {
+            throw new ApiException("Please, make an order of the " + product.getProductName()
+                    + " less than or equal to the quantity " + product.getQuantity() + ".");
         }
 
         CartItem newCartItem = CartItem.builder()
@@ -64,31 +67,40 @@ public class CartServiceImplementation implements CartService {
                 .build();
 
         cartItemRepository.save(newCartItem);
-        cart.setTotalPrice(cart.getTotalPrice()+product.getSpecialPrice()*quantity);
+
+        product.setQuantity(product.getQuantity());
+
+        cart.setTotalPrice(cart.getTotalPrice() + (product.getSpecialPrice() * quantity));
+
         cartRepository.save(cart);
 
-        CartDTO cartDTO = modelMapper.map(cart,CartDTO.class);
+        CartDTO cartDTO = modelMapper.map(cart, CartDTO.class);
+
 
         List<CartItem> cartItems = cart.getCartItems();
-        Stream<ProductDTO> productStream = cartItems.stream().map(item->{
-            ProductDTO map = modelMapper.map(item.getProduct(),ProductDTO.class);
-            map.setQuantity(Math.toIntExact(item.getQuantity()));
-            return map;
-        });
 
-        cartDTO.setProducts(productStream.toList());
+        List<ProductDTO> productList = cartItems.stream().map(item -> {
+            ProductDTO productDTO = modelMapper.map(item.getProduct(), ProductDTO.class);
+            productDTO.setQuantity(item.getQuantity());
+            return productDTO;
+        }).toList();
+
+        cartDTO.setProducts(productList);
 
         return cartDTO;
     }
 
     private Cart createCart() {
         Cart userCart = cartRepository.findCartByEmail(authUtil.loggedInEmail());
-        if(userCart!=null) return userCart;
+        if (userCart != null) {
+            return userCart;
+        }
 
-        Cart cart = Cart.builder()
-                .user(authUtil.loggedInUser)
-                .totalPrice(0.0)
-                .build();
+        Cart cart = new Cart();
+        cart.setTotalPrice(0.00);
+        cart.setUser(authUtil.loggedInUser());
+
         return cartRepository.save(cart);
     }
+
 }
